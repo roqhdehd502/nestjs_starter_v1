@@ -6,21 +6,12 @@ import {
   Param,
   Body,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { PostsService } from './posts.service';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { PostDTO, CreatePostDTO } from './post.dto';
+import { PostService } from './post.service';
 
-interface PostModel {
-  id: number;
-  author: string;
-  title: string;
-  content: string;
-  likeCount: number;
-  commentCount: number;
-  createdAt: Date;
-  updatedAt?: Date;
-}
-
-let posts: PostModel[] = [
+// NOTE: 임시
+let posts: PostDTO[] = [
   {
     id: 1,
     author: '홍길동',
@@ -42,10 +33,10 @@ let posts: PostModel[] = [
   },
 ];
 
-@ApiTags('posts')
-@Controller('posts')
-export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+@ApiTags('post')
+@Controller('post')
+export class PostController {
+  constructor(private readonly postService: PostService) {}
 
   @Get()
   @ApiOperation({ summary: '게시글 목록', description: '게시글 목록 불러오기' })
@@ -68,6 +59,8 @@ export class PostsController {
         updatedAt: post.createdAt ? post.createdAt.toString() : '',
       };
     });
+
+    return parsePosts;
   }
 
   @Get(':id')
@@ -101,12 +94,16 @@ export class PostsController {
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
   @ApiResponse({ status: 500, description: '내부 에러' })
+  @ApiBody({
+    type: CreatePostDTO,
+    description: '게시글 생성에 필요한 데이터',
+  })
   postPost(
     @Body('author') author: string,
     @Body('title') title: string,
     @Body('content') content: string,
   ) {
-    const post: PostModel = {
+    const post: PostDTO = {
       id: !posts.length ? 1 : posts[posts.length - 1].id + 1,
       author: author,
       title: title,
