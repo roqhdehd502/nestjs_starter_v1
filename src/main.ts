@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './modules/app.module';
@@ -5,6 +6,9 @@ import { HttpExceptionFilter } from './filters/http-exceiption.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+
+  // Mongo DB 연동 처리
+  app.useGlobalPipes(new ValidationPipe());
 
   // 전역 예외처리
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -20,6 +24,6 @@ async function bootstrap() {
   SwaggerModule.setup('v1/docs', app, document);
 
   // 앱 포트 적용
-  await app.listen(4000);
+  await app.listen(process.env.PORT);
 }
 bootstrap();
