@@ -7,8 +7,8 @@ import {
   Body,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { PostDTO, CreatePostDTO } from './post.dto';
-import { PostService } from './post.service';
+import { PostDTO, CreatePostDTO } from '../models/post.dto';
+import { PostService } from '../services/post.service';
 
 // NOTE: 임시
 let posts: PostDTO[] = [
