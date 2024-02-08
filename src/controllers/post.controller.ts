@@ -7,7 +7,7 @@ import {
   Body,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { PostPostDTO } from 'src/models/post.model';
+import { PostPostDTO } from '../models/post.model';
 import { PostService } from '../services/post.service';
 
 @ApiTags('post')

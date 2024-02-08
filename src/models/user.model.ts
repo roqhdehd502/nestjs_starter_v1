@@ -35,7 +35,7 @@ export class User extends Document {
   updatedAt?: Date;
 
   readonly readOnlyData: {
-    id: string;
+    _id: string;
     email: string;
     name: string;
   };

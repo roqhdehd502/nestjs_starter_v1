@@ -1,11 +1,15 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './modules/app.module';
 import { HttpExceptionFilter } from './filters/http-exceiption.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+
+  // Cookie 파싱 처리
+  app.use(cookieParser());
 
   // Mongo DB 연동 처리
   app.useGlobalPipes(new ValidationPipe());
