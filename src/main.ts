@@ -1,11 +1,16 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { AppModule } from './modules/app.module';
+import * as cookieParser from 'cookie-parser';
 import { HttpExceptionFilter } from './filters/http-exceiption.filter';
+import { AppModule } from './modules/app.module';
+import { name, version, description } from '../package.json';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
+
+  // Cookie 파싱 처리
+  app.use(cookieParser());
 
   // Mongo DB 연동 처리
   app.useGlobalPipes(new ValidationPipe());
@@ -14,13 +19,14 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Swagger 문서 적용
-  const config = new DocumentBuilder()
-    .setTitle('NestJS Starter V1')
-    .setDescription('NestJS V1 템플릿 입니다.')
-    .setVersion('1.0.0')
+  const options = new DocumentBuilder()
+    .setTitle(name)
+    .setDescription(description)
+    .setVersion(version)
+    .addBearerAuth()
     .build();
   app.setGlobalPrefix('v1');
-  const document = SwaggerModule.createDocument(app, config);
+  const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('v1/docs', app, document);
 
   // 앱 포트 적용

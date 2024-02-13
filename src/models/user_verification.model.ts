@@ -1,31 +1,31 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDate, IsEmail, IsNotEmpty, IsString } from 'class-validator';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
+import { User } from './user.model';
 
 @Schema()
-export class User extends Document {
+export class UserVerification extends Document {
   @Prop({
+    type: Types.ObjectId,
+    ref: 'User',
     required: true,
-    unique: true,
   })
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+  user: User;
 
   @Prop({
     required: true,
   })
   @IsString()
   @IsNotEmpty()
-  password: string;
+  code: string;
 
   @Prop({
     required: true,
   })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  status: string;
 
   @Prop({
     default: Date.now,
@@ -40,14 +40,18 @@ export class User extends Document {
 
   readonly readOnlyData: {
     _id: string;
-    email: string;
-    name: string;
+    user: string;
+    code: string;
+    status: string;
+    createdAt: string;
+    updatedAt?: string;
   };
 }
 
-export const UserSchema = SchemaFactory.createForClass(User);
+export const UserVerificationSchema =
+  SchemaFactory.createForClass(UserVerification);
 
-export class UserPostDTO {
+export class AuthLoginDTO {
   @IsEmail()
   @IsNotEmpty()
   @ApiProperty({ example: 'hong1234@test.com' })
@@ -57,9 +61,4 @@ export class UserPostDTO {
   @IsNotEmpty()
   @ApiProperty({ example: '비밀번호' })
   password: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ example: '홍길동' })
-  name: string;
 }
