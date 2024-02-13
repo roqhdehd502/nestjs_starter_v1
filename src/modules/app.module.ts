@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 import { AppController } from '../controllers/app.controller';
 import * as models from '../models';
 import { AuthModule } from '../modules/auth.module';
-// import PostModule from '../modules/post.module';
+import { PostModule } from '../modules/post.module';
 import { AppService } from '../services/app.service';
 
 @Module({
@@ -15,12 +15,13 @@ import { AppService } from '../services/app.service';
       validationSchema: Joi.object({
         JWT_SECRET: Joi.string().required(),
         JWT_EXPIRATION_TIME: Joi.string().required(),
+        JWT_REFRESH_EXPIRATION_TIME: Joi.string().required(),
       }),
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI),
     MongooseModule.forFeature(Object.values(models)),
     AuthModule,
-    // PostModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,40 +1,20 @@
-import { BadRequestException, Injectable, HttpException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { Model } from 'mongoose';
 import { UserService } from './user.service';
 import TokenPayload from '../interfaces/token_payload.interface';
-import { UserPostDTO } from '../models/user.model';
+import { UserVerification } from '../models/user_verification.model';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    @InjectModel(UserVerification.name)
+    private readonly userVerificationModel: Model<UserVerification>,
   ) {}
-
-  async register(userPostDTO: UserPostDTO) {
-    const { name, email, password } = userPostDTO;
-    const hashedPassword = await bcrypt.hash(password, 10);
-    try {
-      const createdUser = await this.userService.create({
-        email: email,
-        password: hashedPassword,
-        name: name,
-      });
-
-      return createdUser;
-    } catch (error) {
-      throw new HttpException(
-        {
-          cause: new Error(),
-          description: '알 수 없는 에러가 발생했습니다',
-        },
-        500,
-      );
-    }
-  }
 
   async getAuthenticatedUser(email: string, plainTextPassword: string) {
     try {
@@ -50,14 +30,40 @@ export class AuthService {
     }
   }
 
-  getCookieWithJwtToken(userId: string) {
-    const payload: TokenPayload = { userId };
-    const token = this.jwtService.sign(payload);
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get('JWT_EXPIRATION_TIME')}`;
-  }
+  async getCookieWithJwtToken(userId: string) {
+    try {
+      const accessTokenPayload: TokenPayload = { userId };
+      const refreshTokenPayload: TokenPayload = {
+        userId,
+        tokenType: 'refresh',
+      };
+      const accessToken = this.jwtService.sign(accessTokenPayload);
+      const refreshToken = this.jwtService.sign(refreshTokenPayload);
 
-  getCookieForLogOut() {
-    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
+      const updateUserVerication =
+        await this.userVerificationModel.findOneAndUpdate(
+          { user: userId },
+          { code: refreshToken, status: 'ok', updatedAt: Date.now() },
+          { new: true },
+        );
+      if (!updateUserVerication) {
+        await this.userVerificationModel.create({
+          user: userId,
+          code: refreshToken,
+          status: 'ok',
+        });
+      }
+
+      return {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      };
+    } catch (error) {
+      throw new BadRequestException('Bad request authentication', {
+        cause: new Error(),
+        description: '잘못된 인증 정보입니다',
+      });
+    }
   }
 
   private async _verifyPassword(

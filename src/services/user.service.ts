@@ -15,7 +15,7 @@ export class UserService {
   ) {}
 
   async getById(id: string) {
-    const user = await this.userModel.findById({ id });
+    const user = await this.userModel.findById(id);
     if (!user) {
       throw new NotFoundException('Not found user', {
         cause: new Error(),
@@ -49,7 +49,6 @@ export class UserService {
 
     const newUser = await this.userModel.create({
       ...body,
-      createdAt: Date.now(),
     });
 
     return newUser.readOnlyData;
