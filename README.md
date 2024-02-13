@@ -9,54 +9,6 @@ Nest.js, Typescript, Swagger, MongoDB 등이 적용되어 있습니다.
 
 ```json
 "dependencies": {
-  "axios": "^1.6.5",
-  "compression": "^1.7.4",                        | 데이터 압축 라이브러리
-  "cors": "^2.8.5",                               | CORS 처리 라이브러리
-  "dayjs": "^1.11.10",                            | day.js 날짜 처리 라이브러리
-  "dotenv": "^16.3.1",                            | env 환경 변수 적용 라이브러리
-  "express": "^4.18.2",                           | express.js
-  "express-rate-limit": "^7.1.5",                 | express.js api call 제한 라이브러리
-  "express-validator": "^7.0.1",                  | express 검증 확인 라이브러리
-  "form-data": "^4.0.0",                          | form 데이터 라이브러리
-  "joi": "^17.11.0",                              | 검증 확인 라이브러리
-  "jsonwebtoken": "^9.0.2",                       | jwt 라이브러리
-  "mongoose": "^8.0.3",                           | mongo db ORM 라이브러리
-  "mongoose-autopopulate": "^1.1.0",              | mongoose populate 자동화 라이브러리
-  "morgan": "^1.10.0",                            | 서버 로그 라이브러리
-  "multiparty": "^4.2.3",                         | multiparty 라이브러리
-  "node-cron": "^3.0.3",                          | cron 스케쥴링 라이브러리
-  "request-ip": "^3.3.0",                         | 요청자 IP 확인 라이브러리
-  "swagger-autogen": "^2.23.7",                   | swagger 자동 변환 라이브러리
-  "swagger-cli": "^4.0.4",                        | swagger 로그 라이브러리
-  "swagger-jsdoc": "^6.2.8",                      | swagger jsdoc 문서처리
-  "swagger-ui-express": "^4.6.3",                 | swagger ui 라이브러리
-  "xss-clean": "^0.1.4"                           | xss 방지 라이브러리
-},
-"devDependencies": {
-  "@types/compression": "^1.7.5",                 | compression 타입스크립트 적용
-  "@types/cors": "^2.8.17",                       | cors 타입스크립트 적용
-  "@types/express": "^4.17.21",                   | express 타입스크립트 적용
-  "@types/jsonwebtoken": "^9.0.5",                | jsonwebtoken 타입스크립트 적용
-  "@types/morgan": "^1.9.9",                      | morgan 타입스크립트 적용
-  "@types/multiparty": "^0.0.36",                 | multiparty 타입스크립트 적용
-  "@types/node": "^20.10.5",                      | node.js 타입스크립트 적용
-  "@types/node-cron": "^3.0.11",                  | node-cron 타입스크립트 적용
-  "@types/request-ip": "^0.0.41",                 | request-ip 타입스크립트 적용
-  "@types/swagger-jsdoc": "^6.0.4",               | swagger-jsdo 타입스크립트 적용
-  "@types/swagger-ui-express": "^4.1.6",          | swagger-ui-express
-  "@typescript-eslint/eslint-plugin": "^6.16.0",  | eslint 타입스크립트 적용
-  "@typescript-eslint/parser": "^6.16.0",
-  "eslint": "^8.56.0",                            | eslint
-  "eslint-config-prettier": "^9.1.0",
-  "eslint-plugin-prettier": "^5.1.2",
-  "nodemon": "^3.0.2",                            | nodemon
-  "prettier": "^3.1.1",                           | prettier
-  "ts-node": "^10.9.2",
-  "tsconfig-paths": "^4.2.0",                     | typescript config
-  "typescript": "^5.3.3"                          | typescript
-}
-
-"dependencies": {
   "@nestjs/common": "^10.0.0",
   "@nestjs/config": "^3.1.1",
   "@nestjs/core": "^10.0.0",
