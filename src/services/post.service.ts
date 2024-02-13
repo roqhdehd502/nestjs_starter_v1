@@ -66,21 +66,6 @@ export class PostService {
 
   async postPost(user: User, body: PostWithPutPostDTO) {
     try {
-      if (!user) {
-        throw new BadRequestException('Bad request authentication', {
-          cause: new Error(),
-          description: '잘못된 인증 정보입니다.',
-        });
-      }
-
-      const author = await this.userModel.findById(user._id);
-      if (!author) {
-        throw new BadRequestException('Bad request authentication', {
-          cause: new Error(),
-          description: '잘못된 인증 정보입니다.',
-        });
-      }
-
       const { title, content } = body;
       await this.postModel.create({
         author: user._id,
@@ -97,18 +82,14 @@ export class PostService {
 
   async putPost(user: User, body: PostWithPutPostDTO, id: string) {
     try {
-      if (!user) {
-        throw new BadRequestException('Bad request authentication', {
-          cause: new Error(),
-          description: '잘못된 인증 정보입니다.',
-        });
-      }
-
-      const author = await this.userModel.findById(user._id);
+      const author = await this.postModel.findOne({
+        _id: id,
+        author: user._id,
+      });
       if (!author) {
-        throw new BadRequestException('Bad request authentication', {
+        throw new NotFoundException('Not found post', {
           cause: new Error(),
-          description: '잘못된 인증 정보입니다.',
+          description: '수정할 게시글 정보를 찾을 수 없습니다',
         });
       }
 
@@ -134,18 +115,14 @@ export class PostService {
 
   async deletePost(user: User, id: string) {
     try {
-      if (!user) {
-        throw new BadRequestException('Bad request authentication', {
-          cause: new Error(),
-          description: '잘못된 인증 정보입니다.',
-        });
-      }
-
-      const author = await this.userModel.findById(user._id);
+      const author = await this.postModel.findOne({
+        _id: id,
+        author: user._id,
+      });
       if (!author) {
-        throw new BadRequestException('Bad request authentication', {
+        throw new NotFoundException('Not found post', {
           cause: new Error(),
-          description: '잘못된 인증 정보입니다.',
+          description: '삭제할 게시글 정보를 찾을 수 없습니다',
         });
       }
 

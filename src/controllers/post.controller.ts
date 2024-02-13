@@ -12,19 +12,25 @@ import {
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiHeader,
   ApiOperation,
+  ApiParam,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import { Request } from 'express';
 import JwtGuard from '../guards/jwt.guard';
-import RequestWithUser from '../interfaces/request_with_user.interface';
 import { PostWithPutPostDTO } from '../models/post.model';
+import { AuthService } from '../services/auth.service';
 import { PostService } from '../services/post.service';
 
 @ApiTags('post')
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(
+    private readonly authSerive: AuthService,
+    private readonly postService: PostService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: '게시글 목록', description: '게시글 목록 불러오기' })
@@ -36,6 +42,7 @@ export class PostController {
 
   @Get(':id')
   @ApiOperation({ summary: '게시글 상세', description: '게시글 상세 불러오기' })
+  @ApiParam({ name: 'id', description: '게시글 ID' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 404, description: '데이터를 찾을 수 없음' })
   @ApiResponse({ status: 500, description: '내부 에러' })
@@ -47,23 +54,32 @@ export class PostController {
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '게시글 생성', description: '게시글 생성하기' })
-  @ApiResponse({ status: 200, description: '성공' })
-  @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
-  @ApiResponse({ status: 500, description: '내부 에러' })
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access Token (Bearer)',
+    required: true,
+  })
+  @ApiHeader({ name: 'Refresh', description: 'Refresh Token', required: true })
   @ApiBody({
     type: PostWithPutPostDTO,
     description: '게시글 생성에 필요한 데이터',
   })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
+  @ApiResponse({ status: 500, description: '내부 에러' })
   async postPost(
-    @Req() request: RequestWithUser,
-    @Body('title') title: string,
-    @Body('content') content: string,
+    @Req() request: Request,
+    @Body() postPostDTO: PostWithPutPostDTO,
   ) {
-    const body: PostWithPutPostDTO = {
-      title: title,
-      content: content,
-    };
-    await this.postService.postPost(request.user, body);
+    const accessToken = request.headers.authorization?.replace('Bearer ', '');
+    const refreshToken = request.headers.refresh as string;
+
+    const user = await this.authSerive.getUserAsToken(
+      accessToken,
+      refreshToken,
+    );
+
+    await this.postService.postPost(user, postPostDTO);
 
     return {
       status: 'ok',
@@ -74,24 +90,34 @@ export class PostController {
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '게시글 수정', description: '게시글 수정하기' })
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access Token (Bearer)',
+    required: true,
+  })
+  @ApiHeader({ name: 'Refresh', description: 'Refresh Token', required: true })
+  @ApiParam({ name: 'id', description: '게시글 ID' })
+  @ApiBody({
+    type: PostWithPutPostDTO,
+    description: '게시글 수정에 필요한 데이터',
+  })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
   @ApiResponse({ status: 500, description: '내부 에러' })
-  @ApiBody({
-    type: PostWithPutPostDTO,
-    description: '게시글 생성에 필요한 데이터',
-  })
   async putPost(
     @Param('id') id: string,
-    @Req() request: RequestWithUser,
-    @Body('title') title: string,
-    @Body('content') content: string,
+    @Req() request: Request,
+    @Body() putPostDTO: PostWithPutPostDTO,
   ) {
-    const body: PostWithPutPostDTO = {
-      title: title,
-      content: content,
-    };
-    await this.postService.putPost(request.user, body, id);
+    const accessToken = request.headers.authorization?.replace('Bearer ', '');
+    const refreshToken = request.headers.refresh as string;
+
+    const user = await this.authSerive.getUserAsToken(
+      accessToken,
+      refreshToken,
+    );
+
+    await this.postService.putPost(user, putPostDTO, id);
 
     return {
       status: 'ok',
@@ -102,11 +128,26 @@ export class PostController {
   @UseGuards(JwtGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '게시글 삭제', description: '게시글 삭제하기' })
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Access Token (Bearer)',
+    required: true,
+  })
+  @ApiHeader({ name: 'Refresh', description: 'Refresh Token', required: true })
+  @ApiParam({ name: 'id', description: '게시글 ID' })
   @ApiResponse({ status: 200, description: '성공' })
   @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
   @ApiResponse({ status: 500, description: '내부 에러' })
-  async deletePost(@Param('id') id: string, @Req() request: RequestWithUser) {
-    await this.postService.deletePost(request.user, id);
+  async deletePost(@Param('id') id: string, @Req() request: Request) {
+    const accessToken = request.headers.authorization?.replace('Bearer ', '');
+    const refreshToken = request.headers.refresh as string;
+
+    const user = await this.authSerive.getUserAsToken(
+      accessToken,
+      refreshToken,
+    );
+
+    await this.postService.deletePost(user, id);
 
     return {
       status: 'ok',

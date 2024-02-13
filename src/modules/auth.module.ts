@@ -11,29 +11,26 @@ import {
 import { UserModule } from '../modules/user.module';
 import { AuthService } from '../services/auth.service';
 import { LocalStrategy } from '../strategys/local.strategy';
-import { JwtStrategy } from '../strategys/jwt.strategy';
+import { AccessTokenStrategy } from '../strategys/access_token.strategy';
+import { RefreshTokenStrategy } from '../strategys/refresh_token.strategy';
 
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: UserVerification.name, schema: UserVerificationSchema },
     ]),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
-        signOptions: {
-          expiresIn: `${configService.get('JWT_EXPIRATION_TIME')}m`,
-        },
-      }),
-    }),
-    PassportModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.register({}),
     ConfigModule,
     UserModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    AccessTokenStrategy,
+    RefreshTokenStrategy,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}
