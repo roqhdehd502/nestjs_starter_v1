@@ -52,12 +52,12 @@ export class AuthService {
         tokenType: 'refresh',
       };
       const accessToken = this.jwtService.sign(accessTokenPayload, {
-        secret: process.env.JWT_SECRET || 'jwt-secret',
-        expiresIn: process.env.JWT_EXPIRATION_TIME || '14m',
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_EXPIRATION_TIME,
       });
       const refreshToken = this.jwtService.sign(refreshTokenPayload, {
-        secret: process.env.JWT_SECRET || 'jwt-secret',
-        expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME || '14d',
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,
       });
 
       // Refresh Token DB 저장
@@ -91,7 +91,7 @@ export class AuthService {
     try {
       const decodedAccessToken = this.jwtService.verify<TokenPayload>(
         accessToken,
-        { secret: process.env.JWT_SECRET || 'jwt-secret' },
+        { secret: process.env.JWT_SECRET },
       );
       if (!decodedAccessToken) {
         throw new UnauthorizedException('Unauthorized authentication', {
