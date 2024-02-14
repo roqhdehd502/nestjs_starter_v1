@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+// import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 // import cookieParser from 'cookie-parser';
@@ -13,7 +13,7 @@ async function bootstrap() {
   // app.use(cookieParser());
 
   // Mongo DB 연동 처리
-  app.useGlobalPipes(new ValidationPipe());
+  // app.useGlobalPipes(new ValidationPipe());
 
   // 전역 예외처리
   app.useGlobalFilters(new HttpExceptionFilter());
