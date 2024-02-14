@@ -4,7 +4,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './user.module';
 import { PostController } from '../controllers/post.controller';
 import { Post, PostSchema } from '../models/post.model';
-import { User, UserSchema } from '../models/user.model';
 import {
   UserVerification,
   UserVerificationSchema,
@@ -16,7 +15,6 @@ import { PostService } from '../services/post.service';
   imports: [
     MongooseModule.forFeature([
       { name: Post.name, schema: PostSchema },
-      { name: User.name, schema: UserSchema },
       { name: UserVerification.name, schema: UserVerificationSchema },
     ]),
     JwtModule,

@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { SORT } from '../enums/post.enum';
 import { User } from '../models/user.model';
 import { Post, PostWithPutPostDTO } from '../models/post.model';
 
@@ -13,13 +14,15 @@ export class PostService {
   constructor(
     @InjectModel(Post.name)
     private readonly postModel: Model<Post>,
-    @InjectModel(User.name)
-    private readonly userModel: Model<User>,
   ) {}
 
-  async getPostList() {
+  async getPostList(sort: SORT, limit: number, page: number) {
     try {
-      const postList = this.postModel.find().sort({ createdAt: -1 });
+      const postList = this.postModel
+        .find()
+        .sort({ createdAt: sort === SORT.ASC ? 1 : -1 })
+        .skip((page - 1) * limit)
+        .limit(limit);
       const parsedPostList = (await postList).map((post) => {
         return {
           _id: post._id,
