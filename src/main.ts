@@ -30,6 +30,8 @@ async function bootstrap() {
   SwaggerModule.setup('v1/docs', app, document);
 
   // 앱 포트 적용
-  await app.listen(process.env.PORT);
+  // await app.listen(process.env.PORT);
+  await app.listen(4000);
 }
+
 bootstrap();
