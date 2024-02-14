@@ -35,4 +35,4 @@ async function bootstrap() {
 
 bootstrap();
 
-export { AppModule };
+export { bootstrap };
