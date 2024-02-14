@@ -19,21 +19,18 @@ import { AppService } from '../services/app.service';
         JWT_REFRESH_EXPIRATION_TIME: Joi.string().required(),
       }),
     }),
-    //-----------------------------
     MongooseModule.forRoot(process.env.MONGODB_URI),
-    MongooseModule.forFeature(Object.values(models)),
+    // MongooseModule.forFeature(Object.values(models)),
     AuthModule,
     PostModule,
-    //-------------------------------
   ],
   controllers: [AppController],
   providers: [AppService],
   exports: [AppService],
 })
-export class AppModule {}
-// export class AppModule implements NestModule {
-//   private readonly isDev: boolean = process.env.MODE === 'dev' ? true : false;
-//   configure() {
-//     mongoose.set('debug', true);
-//   }
-// }
+export class AppModule implements NestModule {
+  private readonly isDev: boolean = process.env.MODE === 'dev' ? true : false;
+  configure() {
+    mongoose.set('debug', true);
+  }
+}
