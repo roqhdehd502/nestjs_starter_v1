@@ -5,6 +5,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Put,
   Req,
   Res,
   UseGuards,
@@ -90,6 +91,33 @@ export class AuthController {
     return response.send({
       accessToken: accessToken,
       refreshToken: refreshToken,
+    });
+  }
+
+  @Put('refresh')
+  @HttpCode(200)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'JWT 토큰 재발급',
+    description: '로그인 된 유저 JWT 토큰 재발급 (유효한 Refresh Token 필요)',
+  })
+  @ApiHeader({ name: 'Refresh', description: 'Refresh Token', required: true })
+  @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
+  @ApiResponse({ status: 401, description: '인증 에러' })
+  @ApiResponse({ status: 500, description: '내부 에러' })
+  async refresh(@Req() request: Request, @Res() response: Response) {
+    const refreshToken = request.headers.refresh as string;
+
+    const { updatedAccessToken, updatedRefreshToken } =
+      await this.authSerive.updateAccessWithRefreshToken(refreshToken);
+
+    response.setHeader('Authorization', 'Bearer ' + updatedAccessToken);
+    response.setHeader('Refresh', updatedRefreshToken);
+
+    return response.send({
+      accessToken: updatedAccessToken,
+      refreshToken: updatedRefreshToken,
     });
   }
 }
