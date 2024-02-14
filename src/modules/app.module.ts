@@ -22,7 +22,7 @@ import { AppService } from '../services/app.service';
     MongooseModule.forRoot(process.env.MONGODB_URI),
     MongooseModule.forFeature(Object.values(models)),
     AuthModule,
-    // PostModule,
+    PostModule,
   ],
   controllers: [AppController],
   providers: [AppService],
