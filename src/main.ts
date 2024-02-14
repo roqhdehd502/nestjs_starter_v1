@@ -6,7 +6,7 @@ import { HttpExceptionFilter } from './filters/http-exceiption.filter';
 import { AppModule } from './modules/app.module';
 import { name, version, description } from '../package.json';
 
-export default async function bootstrap() {
+async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
   // Cookie 파싱 처리
