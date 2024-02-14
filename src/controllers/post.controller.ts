@@ -8,6 +8,7 @@ import {
   Param,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -15,10 +16,12 @@ import {
   ApiHeader,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+import { SORT } from '../enums/post.enum';
 import JwtGuard from '../guards/jwt.guard';
 import { PostWithPutPostDTO } from '../models/post.model';
 import { AuthService } from '../services/auth.service';
@@ -34,16 +37,42 @@ export class PostController {
 
   @Get()
   @ApiOperation({ summary: '게시글 목록', description: '게시글 목록 불러오기' })
+  @ApiQuery({
+    name: 'sort',
+    description: '정렬 기준',
+    enum: SORT,
+    type: 'string',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'limit',
+    description: '한 페이지 내 불러올 게시글 수',
+    type: Number,
+    required: false,
+  })
+  @ApiQuery({
+    name: 'page',
+    description: '불러올 페이지 넘버',
+    type: Number,
+    required: false,
+  })
   @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
   @ApiResponse({ status: 500, description: '내부 에러' })
-  async getPostList() {
-    return await this.postService.getPostList();
+  async getPostList(
+    @Query('sort') sort: SORT = SORT.DESC,
+    @Query('limit') limit: number = 10,
+    @Query('page') page: number = 1,
+  ) {
+    console.log(sort, limit, page);
+    return await this.postService.getPostList(sort, limit, page);
   }
 
   @Get(':id')
   @ApiOperation({ summary: '게시글 상세', description: '게시글 상세 불러오기' })
   @ApiParam({ name: 'id', description: '게시글 ID' })
   @ApiResponse({ status: 200, description: '성공' })
+  @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
   @ApiResponse({ status: 404, description: '데이터를 찾을 수 없음' })
   @ApiResponse({ status: 500, description: '내부 에러' })
   async getPost(@Param('id') id: string) {

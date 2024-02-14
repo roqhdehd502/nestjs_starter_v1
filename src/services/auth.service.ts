@@ -87,6 +87,84 @@ export class AuthService {
     }
   }
 
+  async updateAccessWithRefreshToken(refreshToken: string) {
+    try {
+      const decodedRefreshToken = await this.jwtService.verify<TokenPayload>(
+        refreshToken,
+        { secret: process.env.JWT_SECRET },
+      );
+      if (!decodedRefreshToken) {
+        throw new UnauthorizedException('Unauthorized authentication', {
+          cause: new Error(),
+          description: '잘못된 인증 정보입니다',
+        });
+      }
+
+      const getUserVerification = this.userVerificationModel.findOne({
+        user: decodedRefreshToken.userId,
+        code: refreshToken,
+        status: 'ok',
+      });
+      if (!getUserVerification) {
+        throw new BadRequestException('Bad request authentication', {
+          cause: new Error(),
+          description: '잘못된 인증 정보입니다',
+        });
+      }
+
+      const user = await this.userService.getById(decodedRefreshToken.userId);
+      if (!user) {
+        throw new BadRequestException('Bad request authentication', {
+          cause: new Error(),
+          description: '잘못된 인증 정보입니다',
+        });
+      }
+
+      // 재발급 할 Access Token, Refresh Token 생성
+      const accessTokenPayload: TokenPayload = {
+        userId: user._id,
+        email: user.email,
+      };
+      const refreshTokenPayload: TokenPayload = {
+        userId: user._id,
+        email: user.email,
+        tokenType: 'refresh',
+      };
+      const updatedAccessToken = this.jwtService.sign(accessTokenPayload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_EXPIRATION_TIME,
+      });
+      const updatedRefreshToken = this.jwtService.sign(refreshTokenPayload, {
+        secret: process.env.JWT_SECRET,
+        expiresIn: process.env.JWT_REFRESH_EXPIRATION_TIME,
+      });
+
+      // Refresh Token DB 업데이트
+      const updateUserVerication =
+        await this.userVerificationModel.findOneAndUpdate(
+          { user: user._id },
+          { code: updatedRefreshToken, status: 'ok', updatedAt: Date.now() },
+          { new: true },
+        );
+      if (!updateUserVerication) {
+        throw new BadRequestException('Bad request authentication', {
+          cause: new Error(),
+          description: '잘못된 인증 정보입니다',
+        });
+      }
+
+      return {
+        updatedAccessToken: updatedAccessToken,
+        updatedRefreshToken: updatedRefreshToken,
+      };
+    } catch (error) {
+      throw new UnauthorizedException('Unauthorized authentication', {
+        cause: new Error(),
+        description: '잘못된 인증 정보입니다',
+      });
+    }
+  }
+
   async getUserAsToken(accessToken: string, refreshToken: string) {
     try {
       const decodedAccessToken = this.jwtService.verify<TokenPayload>(
@@ -101,11 +179,23 @@ export class AuthService {
       }
 
       const getUserVerification = this.userVerificationModel.findOne({
+        user: decodedAccessToken.userId,
         code: refreshToken,
         status: 'ok',
       });
       if (!getUserVerification) {
         throw new BadRequestException('Bad request authentication', {
+          cause: new Error(),
+          description: '잘못된 인증 정보입니다',
+        });
+      }
+
+      const decodedRefreshToken = this.jwtService.verify<TokenPayload>(
+        refreshToken,
+        { secret: process.env.JWT_SECRET },
+      );
+      if (!decodedRefreshToken) {
+        throw new UnauthorizedException('Unauthorized authentication', {
           cause: new Error(),
           description: '잘못된 인증 정보입니다',
         });

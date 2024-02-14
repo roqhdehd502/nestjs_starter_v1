@@ -1,8 +1,17 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsNotEmpty, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsDate,
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { Document, Types } from 'mongoose';
 import { User } from './user.model';
+import { SORT } from '../enums/post.enum';
 
 @Schema()
 export class Post extends Document {
