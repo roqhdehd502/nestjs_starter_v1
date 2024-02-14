@@ -2,9 +2,12 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 // import cookieParser from 'cookie-parser';
+import * as dotenv from 'dotenv';
 import { HttpExceptionFilter } from './filters/http-exceiption.filter';
 import { AppModule } from './modules/app.module';
-// import { name, version, description } from '../package.json';
+import { name, version, description } from '../package.json';
+
+dotenv.config();
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
@@ -19,16 +22,10 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // Swagger 문서 적용
-  // const options = new DocumentBuilder()
-  //   .setTitle(name)
-  //   .setDescription(description)
-  //   .setVersion(version)
-  //   .addBearerAuth()
-  //   .build();
   const options = new DocumentBuilder()
-    .setTitle('NestJS Starter V1')
-    .setDescription('NestJS V1 템플릿 입니다.')
-    .setVersion('1.0.0')
+    .setTitle(name)
+    .setDescription(description)
+    .setVersion(version)
     .addBearerAuth()
     .build();
   app.setGlobalPrefix('v1');
