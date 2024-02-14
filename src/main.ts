@@ -2,14 +2,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 // import cookieParser from 'cookie-parser';
-import * as dotenv from 'dotenv';
 import { HttpExceptionFilter } from './filters/http-exceiption.filter';
 import { AppModule } from './modules/app.module';
 import { name, version, description } from '../package.json';
 
-dotenv.config();
-
-async function bootstrap() {
+export default async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
   // Cookie 파싱 처리
