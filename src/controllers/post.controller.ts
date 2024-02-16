@@ -64,7 +64,6 @@ export class PostController {
     @Query('limit') limit: number = 10,
     @Query('page') page: number = 1,
   ) {
-    console.log(sort, limit, page);
     return await this.postService.getPostList(sort, limit, page);
   }
 
