@@ -4,6 +4,7 @@ import { AuthGuard } from '@nestjs/passport';
 @Injectable()
 export class AuthenticationGuard extends AuthGuard('local') {
   handleRequest(err, user, info) {
+    console.log('info', info);
     if (err || !user) {
       throw new BadRequestException('Bad request authentication', {
         cause: new Error(),

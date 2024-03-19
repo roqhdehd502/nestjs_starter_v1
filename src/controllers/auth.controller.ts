@@ -21,7 +21,7 @@ import {
 import { Request, Response } from 'express';
 import { AuthenticationGuard } from '../guards/auth.guard';
 import JwtGuard from '../guards/jwt.guard';
-import { AuthLoginDTO } from '../models/user_verification.model';
+import { AuthLoginDTO } from '../models/user-verification.model';
 import { AuthService } from '../services/auth.service';
 
 @ApiTags('auth')

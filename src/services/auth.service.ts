@@ -8,9 +8,9 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { Model } from 'mongoose';
 import { UserService } from './user.service';
-import TokenPayload from '../interfaces/token_payload.interface';
-import { AuthLoginDTO } from '../models/user_verification.model';
-import { UserVerification } from '../models/user_verification.model';
+import TokenPayload from '../interfaces/token-payload.interface';
+import { AuthLoginDTO } from '../models/user-verification.model';
+import { UserVerification } from '../models/user-verification.model';
 
 @Injectable()
 export class AuthService {

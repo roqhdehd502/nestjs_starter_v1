@@ -7,7 +7,7 @@ import { Post, PostSchema } from '../models/post.model';
 import {
   UserVerification,
   UserVerificationSchema,
-} from '../models/user_verification.model';
+} from '../models/user-verification.model';
 import { AuthService } from '../services/auth.service';
 import { PostService } from '../services/post.service';
 
