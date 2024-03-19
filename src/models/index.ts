@@ -4,7 +4,7 @@ import { User, UserSchema } from './user.model';
 import {
   UserVerification,
   UserVerificationSchema,
-} from './user_verification.model';
+} from './user-verification.model';
 
 export const PostModelDefinition: ModelDefinition = {
   name: Post.name,
