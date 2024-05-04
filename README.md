@@ -1,7 +1,7 @@
 # NestJS Starter V1
 
 Nest.js 기반으로 제작된 API 템플릿 입니다.
-Nest.js, Typescript, Swagger, MongoDB 등이 적용되어 있습니다.
+Nest.js, Typescript, Swagger, MongoDB(Mongoose) 등이 적용되어 있습니다.
 
 ## 구성
 
@@ -25,6 +25,7 @@ Nest.js, Typescript, Swagger, MongoDB 등이 적용되어 있습니다.
   "cookie-parser": "^1.4.6",                     | 쿠키 파싱 라이브러리
   "joi": "^17.12.1",                             | 입력 검증 라이브러리
   "mongoose": "^8.1.1",                          | mongoose ORM 라이브러리
+  "morgan": "^1.10.0",                           | 로깅 라이브러리
   "passport": "^0.7.0",                          | passport 인증 라이브러리
   "passport-jwt": "^4.0.1",
   "passport-local": "^1.0.0",
@@ -89,6 +90,7 @@ yarn start:dev
 ```
 ├── src                             | src 디렉토리
 │   ├── controllers                 | 컨트롤러 디렉토리
+│   ├── enums                       | enum 디렉토리
 │   ├── filters                     | 필터링 디렉토리
 │   ├── guards                      | 인증 처리(guard) 디렉토리
 │   ├── interfaces                  | 타입스크립트 인터페이스 디렉토리
