@@ -22,7 +22,7 @@ import { AppService } from '../services/app.service';
         JWT_REFRESH_EXPIRATION_TIME: Joi.string().required(),
       }),
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI),
+    MongooseModule.forRoot(`${process.env.MONGODB_URI}/nestjs_starter_v1`),
     MongooseModule.forFeature(Object.values(models)),
     AuthModule,
     PostModule,
