@@ -3,9 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import * as bcrypt from 'bcrypt';
-import { Model } from 'mongoose';
+import mongoose, { Model } from 'mongoose';
 import { User, UserPostDTO } from '../models/user.model';
 
 @Injectable()
@@ -13,6 +13,8 @@ export class UserService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
+    @InjectConnection()
+    private readonly connection: mongoose.Connection,
   ) {}
 
   async getById(id: string) {
@@ -49,13 +51,35 @@ export class UserService {
       });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await this.userModel.create({
-      email: email,
-      name: name,
-      password: hashedPassword,
-    });
+    const session = await this.connection.startSession();
 
-    return newUser.readOnlyData;
+    try {
+      session.startTransaction();
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = await this.userModel.create(
+        [
+          {
+            email: email,
+            name: name,
+            password: hashedPassword,
+          },
+        ],
+        { session },
+      );
+
+      await session.commitTransaction();
+
+      return {
+        email: newUser[0].email,
+        name: newUser[0].name,
+      };
+    } catch (error) {
+      await session.abortTransaction();
+
+      throw error;
+    } finally {
+      session.endSession();
+    }
   }
 }
