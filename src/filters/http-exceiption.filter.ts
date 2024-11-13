@@ -1,7 +1,7 @@
 import {
-  ExceptionFilter,
-  Catch,
   ArgumentsHost,
+  Catch,
+  ExceptionFilter,
   HttpException,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -18,16 +18,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
       case 400:
         response.status(status).json({
           code: status,
-          error: error.message as string,
-          message: error.error as string,
-          details: [],
+          error: error.error as string,
+          message: Array.isArray(error.message)
+            ? (error.message[0] as string)
+            : (error.message as string),
+          details: Array.isArray(error.message)
+            ? [...error.message]
+            : [error.message],
         });
         break;
       default:
         response.status(status).json({
           code: status,
-          error: error.message as string,
-          message: error.error as string,
+          error: error.error as string,
+          message: error.message as string,
         });
     }
   }

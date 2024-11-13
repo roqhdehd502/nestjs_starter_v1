@@ -1,32 +1,54 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-// import cookieParser from 'cookie-parser';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as dotenv from 'dotenv';
+
+import { description, name, version } from '../package.json';
+import { starter } from './lib/mongodb/mongodb.server';
+import { AppModule } from './modules/app/app.module';
 import { HttpExceptionFilter } from './filters/http-exceiption.filter';
-import { AppModule } from './modules/app.module';
-import { name, version, description } from '../package.json';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  // dotenv 환경 변수 설정
+  dotenv.config();
 
-  // Cookie 파싱 처리
-  // app.use(cookieParser());
-
-  // Mongo DB 연동 처리
-  app.useGlobalPipes(new ValidationPipe());
+  // NestJS 앱 생성
+  const app = await NestFactory.create(
+    AppModule,
+    // { cors: true }, // CORS 설정시 해당 옵션 활성화
+  );
 
   // 전역 예외처리
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  // Swagger 문서 적용
-  const options = new DocumentBuilder()
+  // 엔드포인트 접두 설정
+  app.setGlobalPrefix('v1');
+
+  // 입력값 검증 파이프 설정
+  app.useGlobalPipes(new ValidationPipe());
+
+  // NestJS ConfigService 설정
+  const configService = app.get(ConfigService);
+
+  // MongoDB 연결
+  await starter;
+
+  // API Base URL
+  // const API_BASE_URL = configService.get<string>('BASE_URL');
+  // if (!API_BASE_URL) {
+  //   throw new Error('Please define the BASE_URL environment variable');
+  // }
+
+  // SwaggerUI 문서 적용
+  const config = new DocumentBuilder()
     .setTitle(name)
     .setDescription(description)
     .setVersion(version)
+    // .addServer(API_BASE_URL)
     .addBearerAuth()
     .build();
-  app.setGlobalPrefix('v1');
-  const document = SwaggerModule.createDocument(app, options);
+  const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('v1/docs', app, document, {
     customSiteTitle: name,
     customJs: [
@@ -41,7 +63,6 @@ async function bootstrap() {
   });
 
   // 앱 포트 적용
-  await app.listen(process.env.PORT || 4000);
+  await app.listen(configService.get<number>('PORT') || 4000);
 }
-
 bootstrap();
