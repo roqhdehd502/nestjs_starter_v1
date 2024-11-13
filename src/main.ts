@@ -7,7 +7,7 @@ import * as dotenv from 'dotenv';
 import { description, name, version } from '../package.json';
 import { starter } from './lib/mongodb/mongodb.server';
 import { AppModule } from './modules/app/app.module';
-import { HttpExceptionFilter } from './filters/http-exceiption.filter';
+import { HttpExceptionFilter } from './filters/http-exception.filter';
 
 async function bootstrap() {
   // dotenv 환경 변수 설정
