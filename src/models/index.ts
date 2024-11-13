@@ -1,20 +1,24 @@
-import { ModelDefinition } from '@nestjs/mongoose';
-import { Post, PostSchema } from './post.model';
-import { User, UserSchema } from './user.model';
-import {
-  UserVerification,
-  UserVerificationSchema,
-} from './user-verification.model';
+import logSchema, { Log } from './log';
+import postSchema, { Post } from './post';
+import userSchema, { User } from './user';
+import userHashSchema, { UserHash } from './user-hash';
+import { starter } from '~/lib/mongodb/mongodb.server';
 
-export const PostModelDefinition: ModelDefinition = {
-  name: Post.name,
-  schema: PostSchema,
-};
-export const UserModelDefinition: ModelDefinition = {
-  name: User.name,
-  schema: UserSchema,
-};
-export const UserVerificationModelDefinition: ModelDefinition = {
-  name: UserVerification.name,
-  schema: UserVerificationSchema,
-};
+// * 로그 모델
+export const LogModel =
+  starter.models.Log || starter.model<Log>('Log', logSchema);
+// * 게시글 모델
+export const PostModel =
+  starter.models.Post ||
+  starter.model<Post>('Post', postSchema);
+// * 유저 해시 모델
+export const UserHashModel =
+  starter.models.UserHash ||
+  starter.model<UserHash>('UserHash', userHashSchema);
+// * 유저 모델
+export const UserModel =
+  starter.models.User || starter.model<User>('User', userSchema);  
+
+
+
+
