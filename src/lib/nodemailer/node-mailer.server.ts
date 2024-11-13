@@ -29,7 +29,6 @@ export const sendEmail = async ({
      * 필요에 따라 커스터마이징 가능
      */
     let mailOptions = {};
-    console.log('type', type);
     switch (type) {
       case EmailType.RESET_PASSWORD:
         mailOptions = {
