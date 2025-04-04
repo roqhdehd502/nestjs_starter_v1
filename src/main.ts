@@ -14,10 +14,7 @@ async function bootstrap() {
   dotenv.config();
 
   // NestJS 앱 생성
-  const app = await NestFactory.create(
-    AppModule,
-    // { cors: true }, // CORS 설정시 해당 옵션 활성화
-  );
+  const app = await NestFactory.create(AppModule);
 
   // 전역 예외처리
   app.useGlobalFilters(new HttpExceptionFilter());
@@ -35,10 +32,22 @@ async function bootstrap() {
   await starter;
 
   // API Base URL
+  // NOTE-1: SwaggerUI 내 Server에서 사용할 목적으로 API Base URL을 설정
+  // NOTE-2: 필요시 활성화
   // const API_BASE_URL = configService.get<string>('BASE_URL');
   // if (!API_BASE_URL) {
   //   throw new Error('Please define the BASE_URL environment variable');
   // }
+
+  // CORS 설정 (특정 도메인만 허용)
+  // NOTE: 로컬끼리 연동 테스트할 때 사용
+  if (configService.get<string>('NODE_ENV') === 'local') {
+    app.enableCors({
+      origin: ['http://localhost:3000'], // 허용할 프론트엔드 도메인
+      methods: 'GET,POST,PUT,DELETE', // 허용할 HTTP 메소드
+      allowedHeaders: 'Content-Type, Authorization', // 허용할 헤더
+    });
+  }
 
   // SwaggerUI 문서 적용
   const config = new DocumentBuilder()

@@ -27,6 +27,9 @@ export const JWT_EXPIRATION_TIME = process.env.JWT_EXPIRATION_TIME as string;
 export const JWT_REFRESH_EXPIRATION_TIME = process.env
   .JWT_REFRESH_EXPIRATION_TIME as string;
 
+// * 솔트 라운드
+export const SALT_ROUNDS = Number(process.env.SALT_ROUNDS as string);
+
 // * 이메일 환경
 export const MAIL_ID = process.env.MAIL_ID as string;
 export const MAIL_PASSWORD = process.env.MAIL_PASSWORD as string;

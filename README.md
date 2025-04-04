@@ -25,7 +25,6 @@ NestJS, Typescript, Swagger, MongoDB(Mongoose) 등이 적용되어 있습니다.
   "cookie-parser": "^1.4.6",                     | 쿠키 파싱 라이브러리
   "crypto-js": "^4.2.0",                         | 암호화 라이브러리
   "dayjs": "^1.11.13",                           | 날짜 설정 라이브러리
-  "ethers": "^5.0.0",                            | 이더리움 관련 라이브러리
   "ioredis": "^5.4.1",                           | redis 라이브러리
   "joi": "^17.12.1",                             | 입력 검증 라이브러리
   "mongoose": "^8.1.1",                          | mongoose ORM 라이브러리
@@ -152,7 +151,6 @@ import { UserService } from './user.service';
   exports: [UserService],
 })
 export class UserModule {}
-
 ```
 
 새 모듈을 추가하거나 수정이 필요한 경우 app.module.ts에서 관리합니다.
@@ -272,7 +270,7 @@ export class PostController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: '게시글 작성',
-    description: '게시글 작성하기'
+    description: '게시글 작성하기',
   })
   @ApiHeader({ name: 'Refresh', description: '리프레시 토큰', required: true })
   @ApiHeader({
@@ -292,10 +290,7 @@ export class PostController {
   @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
   @ApiResponse({ status: 404, description: '데이터를 찾을 수 없음' })
   @ApiResponse({ status: 500, description: '내부 에러' })
-  async postPost(
-    @Req() request: Request,
-    @Body() body: PostPostDto,
-  ) {
+  async postPost(@Req() request: Request, @Body() body: PostPostDto) {
     return await this.postService.postPost(request, body);
   }
 
@@ -305,7 +300,7 @@ export class PostController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: '게시글 수정',
-    description: '게시글 수정하기'
+    description: '게시글 수정하기',
   })
   @ApiHeader({ name: 'Refresh', description: '리프레시 토큰', required: true })
   @ApiHeader({
@@ -325,10 +320,7 @@ export class PostController {
   @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
   @ApiResponse({ status: 404, description: '데이터를 찾을 수 없음' })
   @ApiResponse({ status: 500, description: '내부 에러' })
-  async putPost(
-    @Req() request: Request,
-    @Body() body: PutPostDto,
-  ) {
+  async putPost(@Req() request: Request, @Body() body: PutPostDto) {
     return await this.postService.putPost(request, body);
   }
 
@@ -397,12 +389,9 @@ export class PostController {
   @ApiResponse({ status: 400, description: '요청상태가 올바르지 않음' })
   @ApiResponse({ status: 404, description: '데이터를 찾을 수 없음' })
   @ApiResponse({ status: 500, description: '내부 에러' })
-  async getPost(
-    @Req() request: Request,
-    @Param('id') id: string,
-  ) {
+  async getPost(@Req() request: Request, @Param('id') id: string) {
     return await this.postService.getPost(request, {
-      id
+      id,
     });
   }
 
@@ -412,7 +401,7 @@ export class PostController {
   @ApiBearerAuth()
   @ApiOperation({
     summary: '게시글 삭제',
-    description: '게시글 삭제하기'
+    description: '게시글 삭제하기',
   })
   @ApiHeader({ name: 'Refresh', description: '리프레시 토큰', required: true })
   @ApiHeader({
@@ -434,16 +423,12 @@ export class PostController {
   @ApiResponse({ status: 404, description: '데이터를 찾을 수 없음' })
   @ApiResponse({ status: 409, description: '이미 존재함' })
   @ApiResponse({ status: 500, description: '내부 에러' })
-  async deletePost(
-    @Req() request: Request,
-    @Param('id') id: string,
-  ) {
+  async deletePost(@Req() request: Request, @Param('id') id: string) {
     return await this.postService.deletePost(request, {
-      id
+      id,
     });
   }
 }
-
 ```
 
 ### service
@@ -464,7 +449,7 @@ import { PostModel } from '~/models';
 import { CommonSort } from '~/common/constants';
 import { GetPostDto, GetPostListDto } from './dto/post.response.dto';
 import { Post } from '~/models/post';
-import { localizedFormatDate } from '~/utils/date';
+import { formatDate } from '~/utils/date';
 import { filterAuthor } from '~/utils/filter';
 
 @Injectable()
@@ -477,10 +462,7 @@ export class PostService {
   ) {}
 
   // * 게시글 작성
-  async postPost(
-    request: Request,
-    body: PostPostDto,
-  ): Promise<GetCommonOkDto> {
+  async postPost(request: Request, body: PostPostDto): Promise<GetCommonOkDto> {
     const LOG_CODE = 'post-post';
 
     const { title, content } = body;
@@ -518,10 +500,7 @@ export class PostService {
   }
 
   // * 게시글 수정
-  async putPost(
-    request: Request,
-    body: PutPostDto,
-  ): Promise<GetCommonOkDto> {
+  async putPost(request: Request, body: PutPostDto): Promise<GetCommonOkDto> {
     const LOG_CODE = 'put-post';
 
     const { id, title, content } = body;
@@ -535,22 +514,16 @@ export class PostService {
         author: user.id,
       });
       if (!post) {
-        throw new NotFoundException(
-          '수정할 게시글을 찾을 수 없습니다',
-          {
-            cause: new Error(),
-            description: 'Not Found Post',
-          },
-        );
+        throw new NotFoundException('수정할 게시글을 찾을 수 없습니다', {
+          cause: new Error(),
+          description: 'Not Found Post',
+        });
       }
       if (post.isDelete) {
-        throw new NotFoundException(
-          '삭제된 게시글입니다',
-          {
-            cause: new Error(),
-            description: 'Deleted Post',
-          },
-        );
+        throw new NotFoundException('삭제된 게시글입니다', {
+          cause: new Error(),
+          description: 'Deleted Post',
+        });
       }
 
       // * 게시글 수정
@@ -614,8 +587,8 @@ export class PostService {
           title: item.title,
           content: item.content,
           author,
-          createdAt: localizedFormatDate(item.createdAt),
-          updatedAt: localizedFormatDate(item.updatedAt),
+          createdAt: formatDate(item.createdAt),
+          updatedAt: formatDate(item.updatedAt),
         };
       });
 
@@ -651,22 +624,16 @@ export class PostService {
       // * 상세 조회
       const post = await PostModel.findById<Post>(id);
       if (!post) {
-        throw new NotFoundException(
-          '게시글을 찾을 수 없습니다',
-          {
-            cause: new Error(),
-            description: 'Not Found Post',
-          },
-        );
+        throw new NotFoundException('게시글을 찾을 수 없습니다', {
+          cause: new Error(),
+          description: 'Not Found Post',
+        });
       }
       if (post.isDelete) {
-        throw new NotFoundException(
-          '삭제된 게시글입니다',
-          {
-            cause: new Error(),
-            description: 'Deleted Post',
-          },
-        );
+        throw new NotFoundException('삭제된 게시글입니다', {
+          cause: new Error(),
+          description: 'Deleted Post',
+        });
       }
 
       // * 결과값 반환
@@ -677,8 +644,8 @@ export class PostService {
         title: post.title,
         content: post.content,
         author,
-        createdAt: localizedFormatDate(post.createdAt),
-        updatedAt: localizedFormatDate(post.updatedAt),
+        createdAt: formatDate(post.createdAt),
+        updatedAt: formatDate(post.updatedAt),
       };
     } catch (error) {
       this.logService.createLog({
@@ -711,13 +678,10 @@ export class PostService {
         author: user.id,
       });
       if (!post) {
-        throw new NotFoundException(
-          '삭제할 게시글을 찾을 수 없습니다',
-          {
-            cause: new Error(),
-            description: 'Not Found Post',
-          },
-        );
+        throw new NotFoundException('삭제할 게시글을 찾을 수 없습니다', {
+          cause: new Error(),
+          description: 'Not Found Post',
+        });
       }
       if (post.isDelete) {
         throw new ConflictException('이미 삭제된 게시글 입니다', {
@@ -739,7 +703,7 @@ export class PostService {
 
       return {
         status: 'ok',
-      }
+      };
     } catch (error) {
       this.logService.createLog({
         request,
@@ -751,7 +715,6 @@ export class PostService {
     }
   }
 }
-
 ```
 
 ### dto (data transfer object)
@@ -761,8 +724,8 @@ dto에서는 해당 기능에 필요한 요청 및 응답 객체를 지정해줍
 또한, dto에서도 NestJS에서 자체적으로 지원하는 swagger 라이브러리를 통해 문서를 자동화 할 수 있습니다.
 
 ```ts
-import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString } from 'class-validator';
 
 // * 게시글 작성 DTO
 export class PostPostDto {
@@ -796,7 +759,7 @@ export class PutPostDto extends PostPostDto {
 ```
 
 ```ts
-import { ApiProperty } from "@nestjs/swagger";
+import { ApiProperty } from '@nestjs/swagger';
 
 // * 게시글 조회 DTO
 export class GetPostDto {

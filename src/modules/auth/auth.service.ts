@@ -16,7 +16,7 @@ import {
 } from '~/common/constants';
 import { UserHashModel, UserModel } from '~/models';
 import { comparePassword, createJwt } from '~/utils/auth';
-import { localizedFormatDate } from '~/utils/date';
+import { formatDate } from '~/utils/date';
 
 import { LogService } from '../log/log.service';
 import { GetUserDto } from '../user/dto/user.response.dto';
@@ -58,8 +58,8 @@ export class AuthService {
       return {
         id: user._id.toString(),
         email: user.email,
-        createdAt: localizedFormatDate(user.createdAt),
-        updatedAt: localizedFormatDate(user.updatedAt),
+        createdAt: formatDate(user.createdAt),
+        updatedAt: formatDate(user.updatedAt),
       };
     } catch (error) {
       throw error;
@@ -94,7 +94,10 @@ export class AuthService {
       }
 
       // * 비밀번호 검증
-      const validatePassword = await comparePassword(password, userHash.hash);
+      const validatePassword = await comparePassword(
+        password.toString(),
+        userHash.hash,
+      );
       if (!validatePassword) {
         throw new UnauthorizedException('인증에 실패하였습니다', {
           cause: new Error(),
@@ -196,8 +199,8 @@ export class AuthService {
       return {
         id: user._id.toString(),
         email: user.email,
-        createdAt: localizedFormatDate(user.createdAt),
-        updatedAt: localizedFormatDate(user.updatedAt),
+        createdAt: formatDate(user.createdAt),
+        updatedAt: formatDate(user.updatedAt),
       };
     } catch (error) {
       this.logService.createLog({

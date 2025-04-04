@@ -5,17 +5,16 @@ import {
   JWT_EXPIRATION_TIME,
   JWT_REFRESH_EXPIRATION_TIME,
   JWT_SECRET,
+  SALT_ROUNDS,
 } from '~/common/constants';
 import { GetUserDto } from '~/modules/user/dto/user.response.dto';
-
-const DEFAULT_SALT_ROUNDS = 10;
 
 /**
  * 비밀번호 해싱
  */
 export const hashPassword = async (password: string) => {
   try {
-    const hashedPassword = await bcrypt.hash(password, DEFAULT_SALT_ROUNDS);
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     return hashedPassword;
   } catch (error) {
     throw error;

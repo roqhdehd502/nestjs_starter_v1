@@ -11,7 +11,7 @@ import { PostModel } from '~/models';
 import { CommonSort } from '~/common/constants';
 import { GetPostDto, GetPostListDto } from './dto/post.response.dto';
 import { Post } from '~/models/post';
-import { localizedFormatDate } from '~/utils/date';
+import { formatDate } from '~/utils/date';
 import { filterAuthor } from '~/utils/filter';
 
 @Injectable()
@@ -24,10 +24,7 @@ export class PostService {
   ) {}
 
   // * 게시글 작성
-  async postPost(
-    request: Request,
-    body: PostPostDto,
-  ): Promise<GetCommonOkDto> {
+  async postPost(request: Request, body: PostPostDto): Promise<GetCommonOkDto> {
     const LOG_CODE = 'post-post';
 
     const { title, content } = body;
@@ -65,10 +62,7 @@ export class PostService {
   }
 
   // * 게시글 수정
-  async putPost(
-    request: Request,
-    body: PutPostDto,
-  ): Promise<GetCommonOkDto> {
+  async putPost(request: Request, body: PutPostDto): Promise<GetCommonOkDto> {
     const LOG_CODE = 'put-post';
 
     const { id, title, content } = body;
@@ -82,22 +76,16 @@ export class PostService {
         author: user.id,
       });
       if (!post) {
-        throw new NotFoundException(
-          '수정할 게시글을 찾을 수 없습니다',
-          {
-            cause: new Error(),
-            description: 'Not Found Post',
-          },
-        );
+        throw new NotFoundException('수정할 게시글을 찾을 수 없습니다', {
+          cause: new Error(),
+          description: 'Not Found Post',
+        });
       }
       if (post.isDelete) {
-        throw new NotFoundException(
-          '삭제된 게시글입니다',
-          {
-            cause: new Error(),
-            description: 'Deleted Post',
-          },
-        );
+        throw new NotFoundException('삭제된 게시글입니다', {
+          cause: new Error(),
+          description: 'Deleted Post',
+        });
       }
 
       // * 게시글 수정
@@ -161,8 +149,8 @@ export class PostService {
           title: item.title,
           content: item.content,
           author,
-          createdAt: localizedFormatDate(item.createdAt),
-          updatedAt: localizedFormatDate(item.updatedAt),
+          createdAt: formatDate(item.createdAt),
+          updatedAt: formatDate(item.updatedAt),
         };
       });
 
@@ -198,22 +186,16 @@ export class PostService {
       // * 상세 조회
       const post = await PostModel.findById<Post>(id);
       if (!post) {
-        throw new NotFoundException(
-          '게시글을 찾을 수 없습니다',
-          {
-            cause: new Error(),
-            description: 'Not Found Post',
-          },
-        );
+        throw new NotFoundException('게시글을 찾을 수 없습니다', {
+          cause: new Error(),
+          description: 'Not Found Post',
+        });
       }
       if (post.isDelete) {
-        throw new NotFoundException(
-          '삭제된 게시글입니다',
-          {
-            cause: new Error(),
-            description: 'Deleted Post',
-          },
-        );
+        throw new NotFoundException('삭제된 게시글입니다', {
+          cause: new Error(),
+          description: 'Deleted Post',
+        });
       }
 
       // * 결과값 반환
@@ -224,8 +206,8 @@ export class PostService {
         title: post.title,
         content: post.content,
         author,
-        createdAt: localizedFormatDate(post.createdAt),
-        updatedAt: localizedFormatDate(post.updatedAt),
+        createdAt: formatDate(post.createdAt),
+        updatedAt: formatDate(post.updatedAt),
       };
     } catch (error) {
       this.logService.createLog({
@@ -258,13 +240,10 @@ export class PostService {
         author: user.id,
       });
       if (!post) {
-        throw new NotFoundException(
-          '삭제할 게시글을 찾을 수 없습니다',
-          {
-            cause: new Error(),
-            description: 'Not Found Post',
-          },
-        );
+        throw new NotFoundException('삭제할 게시글을 찾을 수 없습니다', {
+          cause: new Error(),
+          description: 'Not Found Post',
+        });
       }
       if (post.isDelete) {
         throw new ConflictException('이미 삭제된 게시글 입니다', {
@@ -286,7 +265,7 @@ export class PostService {
 
       return {
         status: 'ok',
-      }
+      };
     } catch (error) {
       this.logService.createLog({
         request,

@@ -8,12 +8,9 @@ import {
 
 import { EmailType } from '~/common/constants';
 import { sendEmail } from '~/lib/nodemailer/node-mailer.server';
-import {
-  UserHashModel,
-  UserModel,
-} from '~/models';
+import { UserHashModel, UserModel } from '~/models';
 import { comparePassword, createJwt, hashPassword } from '~/utils/auth';
-import { localizedFormatDate } from '~/utils/date';
+import { formatDate } from '~/utils/date';
 import { createRandomString } from '~/utils/generate';
 
 import { GetCommonOkDto } from '../app/dto/app.response.dto';
@@ -41,10 +38,7 @@ export class UserService {
   ) {}
 
   // * 회원가입
-  async register(
-    request: Request,
-    body: RegisterDto,
-  ): Promise<GetJwtDto> {
+  async register(request: Request, body: RegisterDto): Promise<GetJwtDto> {
     const LOG_CODE = 'create-user';
 
     const session = await starter.startSession();
@@ -69,7 +63,7 @@ export class UserService {
       await user.save({ session });
 
       // * 유저 해시 생성
-      const hash = await hashPassword(password);
+      const hash = await hashPassword(password.toString());
       const newUserHash = new UserHashModel({
         user: user._id,
         hash,
@@ -80,8 +74,8 @@ export class UserService {
       const getUserDto: GetUserDto = {
         id: user._id.toString(),
         email: user.email,
-        createdAt: localizedFormatDate(user.createdAt),
-        updatedAt: localizedFormatDate(user.updatedAt),
+        createdAt: formatDate(user.createdAt),
+        updatedAt: formatDate(user.updatedAt),
       };
 
       // * Access Token, Refresh Token 생성
@@ -161,7 +155,7 @@ export class UserService {
       });
 
       // * 비밀번호 해시화
-      const encrypted = await hashPassword(newPassword);
+      const encrypted = await hashPassword(newPassword.toString());
 
       // * 비밀번호 업데이트
       hashedPassword.hash = encrypted;
@@ -222,7 +216,7 @@ export class UserService {
       }
 
       const isPasswordValid = await comparePassword(
-        currentPassword,
+        currentPassword.toString(),
         hashedPassword.hash,
       );
       if (!isPasswordValid) {
@@ -233,7 +227,7 @@ export class UserService {
       }
 
       // * 기존 비밀번호와 변경할 비밀번호가 다른지 확인
-      if (currentPassword == newPassword) {
+      if (currentPassword.toString() == newPassword.toString()) {
         throw new BadRequestException(
           '새 비밀번호는 기존 비밀번호와 달라야합니다',
           {
@@ -244,7 +238,7 @@ export class UserService {
       }
 
       // * 비밀번호 해시화
-      const encrypted = await hashPassword(newPassword);
+      const encrypted = await hashPassword(newPassword.toString());
 
       // * 비밀번호 업데이트
       hashedPassword.hash = encrypted;
@@ -297,7 +291,7 @@ export class UserService {
       }
 
       const isPasswordValid = await comparePassword(
-        password,
+        password.toString(),
         hashedPassword.hash,
       );
       if (!isPasswordValid) {

@@ -35,7 +35,6 @@
     "cookie-parser": "^1.4.6",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.13",
-    "ethers": "^5.0.0",
     "ioredis": "^5.4.1",
     "joi": "^17.12.1",
     "mongoose": "^8.1.1",
